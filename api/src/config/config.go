@@ -10,15 +10,20 @@ import (
 )
 
 var (
+
 	//StringConexaoBanco é a string de conexão com o MySQL.
 	StringConexaoBanco = ""
 
 	// Porta onde a API vai estar rodando.
 	Porta = 0
+
+	// A chave usada para ativar o token
+	SecretKey []byte
 )
 
 // Carregar vai inicializar as variaveis de ambiente.
 func Carregar() {
+
 	var erro error
 
 	if erro = godotenv.Load(); erro != nil {
@@ -35,5 +40,7 @@ func Carregar() {
 		os.Getenv("DB_SENHA"),
 		os.Getenv("DB_NOME"),
 	)
+
+	SecretKey = []byte(os.Getenv("SECRET_KEY"))
 
 }
