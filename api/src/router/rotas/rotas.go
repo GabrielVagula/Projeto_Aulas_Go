@@ -2,7 +2,6 @@ package rotas
 
 import (
 	"API/src/middlewares"
-	"fmt"
 	"net/http"
 
 	"github.com/gorilla/mux"
@@ -23,8 +22,6 @@ func Configurar(r *mux.Router) *mux.Router {
 	rotas = append(rotas, rotasPublicacoes...)
 
 	for _, rota := range rotas {
-
-		fmt.Printf("Registrando rota: %s [%s]\n", rota.URI, rota.Metodo)
 
 		if rota.RequerAutenticacao {
 			r.HandleFunc(rota.URI,
