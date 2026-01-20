@@ -14,5 +14,4 @@ insert into publicacoes (titulo, conteudo, autor_id)
 values
 ("Publicação do usuario 1", "Essa é a publicação teste do usuário 1!", 1),
 ("Publicação do usuario 2", "Essa é a publicação teste do usuário 2!", 2),
-("Publicação do usuario 3", "Essa é a publicação teste do usuário 3!", 3),
-("Publicação do usuario 5", "Essa é a publicação teste do usuário 5!", 5);
+("Publicação do usuario 3", "Essa é a publicação teste do usuário 3!", 3);

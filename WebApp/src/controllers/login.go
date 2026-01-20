@@ -50,6 +50,7 @@ func FazerLogin(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	respostas.JSON(w, http.StatusOK, nil)
+	// No final do FazerLogin em controllers/login.go
+	respostas.JSON(w, http.StatusOK, struct{}{})
 
 }

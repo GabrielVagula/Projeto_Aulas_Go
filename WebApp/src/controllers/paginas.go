@@ -2,13 +2,20 @@ package controllers
 
 import (
 	"WebApp/src/config"
+	"WebApp/src/cookies"
+	"WebApp/src/modelos"
 	"WebApp/src/requisicoes"
+	"WebApp/src/respostas"
 	"WebApp/src/utils"
+	"encoding/json"
 	"fmt"
 	"net/http"
+	"strconv"
+
+	"github.com/gorilla/mux"
 )
 
-// CarregarTelaDeLogin vai renderezar a tela de Login
+// CarregarTelaDeLogin renderiza a tela de Login
 func CarregarTelaDeLogin(w http.ResponseWriter, r *http.Request) {
 	utils.ExecutarTemplate(w, "login.html", nil)
 }
@@ -20,27 +27,71 @@ func CarregarPaginaDeCadastroDeUsuario(w http.ResponseWriter, r *http.Request) {
 
 // CarregarPaginaPrincipal carrega a pagina principal com as publicações.
 func CarregarPaginaPrincipal(w http.ResponseWriter, r *http.Request) {
+
 	url := fmt.Sprintf("%s/publicacoes", config.APIURL)
 
 	response, erro := requisicoes.FazerRequisicaoComAutenticacao(r, http.MethodGet, url, nil)
-
-	// 1. Verifique o erro PRIMEIRO
 	if erro != nil {
-		fmt.Println("Erro ao fazer a requisição:", erro)
-		utils.ExecutarTemplate(w, "home.html", nil) // Ou uma página de erro
+		respostas.JSON(w, http.StatusInternalServerError, respostas.ErroAPI{Erro: erro.Error()})
+		return
+	}
+	defer response.Body.Close()
+
+	if response.StatusCode >= 400 {
+		respostas.TratarStatusCodeDeErro(w, response)
 		return
 	}
 
-	// 2. Garanta que o corpo da resposta será fechado
-	defer response.Body.Close()
-
-	// 3. Agora sim você pode acessar o StatusCode com segurança
-	fmt.Println("Status Code da API:", response.StatusCode, "Erro:", erro)
-
-	// Aqui você provavelmente vai querer tratar se o status não for 200
-	if response.StatusCode >= 400 {
-		fmt.Println("A API retornou um erro:", response.StatusCode)
+	var publicacoes []modelos.Publicacao
+	if erro = json.NewDecoder(response.Body).Decode(&publicacoes); erro != nil {
+		respostas.JSON(w, http.StatusUnprocessableEntity, respostas.ErroAPI{Erro: erro.Error()})
+		return
 	}
 
-	utils.ExecutarTemplate(w, "home.html", nil)
+	cookie, _ := cookies.Ler(r)
+	usuarioID, _ := strconv.ParseUint(cookie["id"], 10, 64)
+
+	utils.ExecutarTemplate(w, "home.html", struct {
+		Publicacoes []modelos.Publicacao
+		UsuarioID   uint64
+	}{
+		Publicacoes: publicacoes,
+		UsuarioID:   usuarioID,
+	})
+
+}
+
+// CarregarPaginaDeAtualizacaoDePublicacao carrega a pagina de edição de publicação.
+func CarregarPaginaDeAtualizacaoDePublicacao(w http.ResponseWriter, r *http.Request) {
+
+	parametros := mux.Vars(r)
+	publicacaoID, erro := strconv.ParseUint(parametros["publicacaoId"], 10, 64)
+	if erro != nil {
+		respostas.JSON(w, http.StatusBadRequest, respostas.ErroAPI{Erro: erro.Error()})
+		return
+	}
+
+	url := fmt.Sprintf("%s/publicacoes/%d", config.APIURL, publicacaoID)
+	response, erro := requisicoes.FazerRequisicaoComAutenticacao(r, http.MethodGet, url, nil)
+	if erro != nil {
+		respostas.JSON(w, http.StatusInternalServerError, respostas.ErroAPI{Erro: erro.Error()})
+		return
+	}
+	defer response.Body.Close()
+
+	if response.StatusCode >= 400 {
+
+		respostas.TratarStatusCodeDeErro(w, response)
+		return
+
+	}
+
+	var publicacao modelos.Publicacao
+	if erro = json.NewDecoder(response.Body).Decode(&publicacao); erro != nil {
+		respostas.JSON(w, http.StatusUnprocessableEntity, respostas.ErroAPI{Erro: erro.Error()})
+		return
+	}
+
+	utils.ExecutarTemplate(w, "atualizar-publicacao.html", publicacao)
+
 }
