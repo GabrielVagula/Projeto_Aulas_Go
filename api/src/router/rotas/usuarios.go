@@ -44,7 +44,7 @@ var rotasUsuarios = []Rota{
 		RequerAutenticacao: true,
 	},
 	{
-		URI:                "/usuarios/{usuarioId}/para-de-seguir",
+		URI:                "/usuarios/{usuarioId}/parar-de-seguir",
 		Metodo:             http.MethodPost,
 		Funcao:             controllers.PararDeSeguirUsuario,
 		RequerAutenticacao: true,

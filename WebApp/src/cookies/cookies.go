@@ -3,6 +3,7 @@ package cookies
 import (
 	"WebApp/src/config"
 	"net/http"
+	"time"
 
 	"github.com/gorilla/securecookie"
 )
@@ -54,5 +55,18 @@ func Ler(r *http.Request) (map[string]string, error) {
 	}
 
 	return valores, nil
+
+}
+
+// Deletar remove os valores armazenados no cookie
+func Deletar(w http.ResponseWriter) {
+
+	http.SetCookie(w, &http.Cookie{
+		Name:     "dados",
+		Value:    "",
+		Path:     "/",
+		HttpOnly: true,
+		Expires:  time.Unix(0, 0),
+	})
 
 }

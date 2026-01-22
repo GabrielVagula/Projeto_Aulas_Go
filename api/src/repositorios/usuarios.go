@@ -42,6 +42,7 @@ func (repositorio Usuarios) Criar(usuario modelos.Usuario) (uint64, error) {
 
 // Buscas traz todos os usuarios que atendem a um filtro com o nome ou nick
 func (repositorio Usuarios) Buscar(nomeOuNick string) ([]modelos.Usuario, error) {
+
 	nomeOuNick = fmt.Sprintf("%%%s%%", nomeOuNick)
 
 	linhas, erro := repositorio.DB.Query(

@@ -59,7 +59,7 @@ func CriarUsuario(w http.ResponseWriter, r *http.Request) {
 // Busca os usuarios registrados no banco de dados.
 func BuscarUsuarios(w http.ResponseWriter, r *http.Request) {
 
-	nomeOuNick := strings.ToLower(r.URL.Query().Get("usuarios"))
+	nomeOuNick := strings.ToLower(r.URL.Query().Get("usuario"))
 
 	db, erro := banco.Conectar()
 	if erro != nil {
